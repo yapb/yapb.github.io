@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yapb.github.io/sitemap.xml

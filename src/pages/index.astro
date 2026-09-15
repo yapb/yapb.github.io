@@ -1,0 +1,1308 @@
+---
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YaPB — The Counter-Strike Bot</title>
+    <meta
+      name="description"
+      content="YaPB is an open-source bot for Counter-Strike 1.6 and Condition Zero. Download the latest release, grab waypoints, read the docs."
+    />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href="https://yapb.github.io/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="YaPB" />
+    <meta property="og:url" content="https://yapb.github.io/" />
+    <meta property="og:title" id="ogTitle" content="YaPB — The Counter-Strike Bot" />
+    <meta property="og:description" id="ogDesc" content="YaPB is an open-source bot for Counter-Strike 1.6 and Condition Zero. Download the latest release, grab waypoints, read the docs." />
+    <meta property="og:image" content="https://yapb.github.io/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="YaPB — The Counter-Strike Bot" />
+    <meta property="og:locale" id="ogLocale" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" id="twTitle" content="YaPB — The Counter-Strike Bot" />
+    <meta name="twitter:description" id="twDesc" content="YaPB is an open-source bot for Counter-Strike 1.6 and Condition Zero. Download the latest release, grab waypoints, read the docs." />
+    <meta name="twitter:image" content="https://yapb.github.io/og.png" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "YaPB",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": ["Windows", "Linux"],
+      "description": "YaPB is an open-source bot for Counter-Strike 1.6 and Condition Zero.",
+      "url": "https://yapb.github.io/",
+      "downloadUrl": "https://github.com/yapb/yapb/releases",
+      "codeRepository": "https://github.com/yapb/yapb",
+      "license": "https://unlicense.org/",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Organization", "name": "YaPB Team" }
+    }
+    </script>
+    <meta name="theme-color" content="#080a0d" id="themeColor" />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('yapb-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+        else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'light';
+      } catch {}
+    </script>
+    <style is:global>
+      :root {
+        color-scheme: dark;
+        --bg: #080a0d;
+        --panel: #0e1218;
+        --line: rgba(255, 255, 255, 0.09);
+        --text: #f2f4f7;
+        --muted: #a8a29e;
+        --accent: #ffb454;
+        --accent-hover: #ffc37a;
+        --accent-ink: #14100a;
+        --soft: rgba(255, 255, 255, 0.03);
+        --hover: rgba(255, 255, 255, 0.06);
+        --grid: rgba(255, 255, 255, 0.075);
+        --header-bg: rgba(8, 10, 13, 0.72);
+        --menu-bg: rgba(14, 18, 24, 0.98);
+        --overlay: rgba(0, 0, 0, 0.65);
+      }
+      [data-theme="light"] {
+        color-scheme: light;
+        --bg: #f4f1ea;
+        --panel: #ffffff;
+        --line: rgba(23, 20, 12, 0.14);
+        --text: #1c1913;
+        --muted: #6f675c;
+        --accent: #c27000;
+        --accent-hover: #a35c00;
+        --accent-ink: #fff8ec;
+        --soft: rgba(23, 20, 12, 0.04);
+        --hover: rgba(23, 20, 12, 0.07);
+        --grid: rgba(23, 20, 12, 0.07);
+        --header-bg: rgba(244, 241, 234, 0.82);
+        --menu-bg: rgba(255, 255, 255, 0.98);
+        --overlay: rgba(28, 25, 19, 0.45);
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(700px 500px at 85% 110%, rgba(255, 180, 84, 0.11), transparent 60%),
+          var(--bg);
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: radial-gradient(700px 420px at 50% 30%, black 30%, transparent 75%);
+      }
+      .side {
+        position: fixed;
+        top: 0;
+        height: 100svh;
+        width: min(320px, 24vw);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .side-l { left: 0; }
+      .side-r { right: 0; }
+      @media (max-width: 1150px) { .side { display: none; } }
+      a:link, a:visited { color: var(--text); text-decoration: none; }
+      .links a:link, .links a:visited { color: var(--muted); }
+      .links a:hover { color: var(--accent); background: var(--hover); border-color: var(--accent); }
+      .wrap {
+        width: min(1060px, calc(100% - 40px));
+        margin-inline: auto;
+      }
+      /* nav */
+      header {
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(8px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--header-bg);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 74px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        font-size: 24px;
+      }
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .brand-mark img { width: 100%; height: 100%; display: block; }
+      .links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .theme-btn {
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        margin-left: 6px;
+      }
+      .theme-btn:hover { color: var(--accent); border-color: var(--accent); }
+      .lang {
+        display: inline-flex;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-left: 6px;
+      }
+      .lang-btn {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font: inherit;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        padding: 8px 9px;
+        cursor: pointer;
+      }
+      .lang-btn.active { background: var(--accent); color: var(--accent-ink); font-weight: 800; }
+      .navdrop { position: relative; }
+      .navdrop-btn {
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        color: var(--muted);
+        background: transparent;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .navdrop-btn:hover { color: var(--accent); background: var(--hover); border-color: var(--accent); }
+      .navdrop-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 230px;
+        background: var(--menu-bg);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 6px;
+        z-index: 30;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      }
+      .navdrop-menu[hidden] { display: none; }
+      .navdrop-menu a:link, .navdrop-menu a:visited { border: none; }
+      .navdrop-menu a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: none;
+      }
+      .navdrop-menu a:hover { border: none; }
+      .nd-host { font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--muted); }
+      .nd-off {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--muted);
+        opacity: 0.45;
+        cursor: not-allowed;
+        user-select: none;
+      }
+      .nd-soon {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 8px;
+      }
+      .links a {
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+      }
+      .links a:hover { color: var(--accent); background: var(--hover); border-color: var(--accent); }
+      /* hero */
+      main { flex: 1; display: flex; align-items: center; position: relative; z-index: 1; }
+      .hero {
+        text-align: center;
+        padding: 84px 0 72px;
+        position: relative;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        background: var(--soft);
+        padding: 8px 14px;
+        border-radius: 999px;
+      }
+      .dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #7ee787;
+        box-shadow: 0 0 10px #7ee787;
+      }
+      h1 {
+        margin: 26px 0 0;
+        font-size: clamp(64px, 13vw, 148px);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        font-weight: 900;
+      }
+      h1 span { color: var(--accent); }
+      .sub {
+        margin: 18px 0 0;
+        font-size: clamp(16px, 2.6vw, 22px);
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+      .sub strong { color: var(--text); font-weight: 650; }
+      .dl-count {
+        margin: 28px 0 0;
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        min-height: 22px;
+      }
+      #dlNum { color: var(--accent); font-weight: 800; }
+      .cta {
+        margin-top: 36px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        text-decoration: none;
+        font-weight: 750;
+        font-size: 14px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 15px 26px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-family: inherit;
+        transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      }
+      .btn:active { transform: translateY(1px); }
+      .btn-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        min-width: 250px;
+      }
+      .btn-primary:hover { background: var(--accent-hover); }
+      .caret { font-size: 12px; opacity: 0.7; }
+      /* download dropdown */
+      .dl { position: relative; display: inline-block; }
+      .dl-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(600px, 92vw);
+        background: var(--menu-bg);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+        text-align: left;
+        z-index: 30;
+      }
+      .dl-menu[hidden] { display: none; }
+      .dl-group {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        background: var(--soft);
+        min-width: 0;
+      }
+      .dl-group-title {
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+      }
+      .dl-group-title .ver { color: var(--accent); font-weight: 800; letter-spacing: 0.02em; }
+      .pill {
+        font-size: 10px;
+        border: 1px solid rgba(255, 180, 84, 0.5);
+        border-radius: 999px;
+        padding: 2px 8px;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+      }
+      .dl-items { display: flex; flex-direction: column; gap: 2px; }
+      .dl-items a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 11px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .dl-items a:link, .dl-items a:visited {
+        color: var(--text);
+      }
+      .dl-items a:hover { background: var(--hover); color: var(--accent); }
+      .dl-items a .sz { color: var(--muted); font-size: 12px; font-weight: 400; white-space: nowrap; }
+      .dl-all:link, .dl-all:visited {
+        grid-column: 1 / -1;
+        text-align: center;
+        font-size: 13px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 8px;
+        border-radius: 8px;
+      }
+      .dl-all:hover { color: var(--accent); background: var(--hover); }
+      .dl-status {
+        grid-column: 1 / -1;
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted);
+        opacity: 0.8;
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--soft);
+        min-width: 250px;
+      }
+      .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+      .inst-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(560px, 92vw);
+        background: var(--menu-bg);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+        text-align: left;
+        z-index: 30;
+      }
+      .inst-menu[hidden] { display: none; }
+      .inst-menu .steps { gap: 10px; }
+      .inst-menu .steps li { padding: 12px; }
+      .steps { list-style: none; margin: 0 auto; padding: 0; max-width: 660px; display: flex; flex-direction: column; gap: 16px; }
+      .steps li {
+        display: grid;
+        grid-template-columns: 52px 1fr;
+        gap: 14px;
+        align-items: start;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+        background: var(--soft);
+      }
+      .step-n { font-weight: 900; font-size: 18px; color: var(--accent); }
+      .steps p { margin: 0; font-size: 14px; line-height: 1.6; }
+      .steps p code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88em;
+        background: var(--hover);
+        padding: 1px 7px;
+        border-radius: 6px;
+      }
+      .steps a:link, .steps a:visited { color: var(--accent); text-decoration: none; }
+      .steps a:hover { text-decoration: underline; }
+      .codebox {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 12px;
+        background: #0b0e13;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 10px 10px 12px;
+      }
+      .codebox code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: #f2f4f7;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .copybtn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #f2f4f7;
+        border-radius: 8px;
+        padding: 6px 11px;
+        cursor: pointer;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .copybtn:hover { color: var(--accent); border-color: var(--accent); }
+      .note { margin-top: 10px !important; font-size: 13px !important; color: var(--muted) !important; }
+      #dlStars:link, #dlStars:visited, #dlForks:link, #dlForks:visited { color: var(--muted); }
+      #dlStars:hover, #dlForks:hover { color: var(--accent); }
+      #starNum, #forkNum { color: var(--accent); font-weight: 800; }
+      .stat-ico { width: 12px; height: 12px; vertical-align: -1px; }
+      footer {
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+        position: relative;
+        z-index: 1;
+      }
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 0;
+        flex-wrap: wrap;
+      }
+      .foot a:link, .foot a:visited { color: var(--muted); text-decoration: none; }
+      .foot a:hover { color: var(--accent); }
+      .foot-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .foot-btn:hover { color: var(--accent); }
+      .modal-note {
+        font-size: 11.5px;
+        line-height: 1.6;
+        color: var(--muted);
+        margin: 12px 0 0;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+      .modal-note a:link, .modal-note a:visited { color: var(--muted); text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,0.3); }
+      .modal-note a:hover { color: var(--accent); }
+      .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; }
+      .modal[hidden] { display: none; }
+      .modal-back { position: absolute; inset: 0; background: var(--overlay); }
+      .modal-card {
+        position: relative;
+        width: min(580px, 100%);
+        max-height: 82svh;
+        display: flex;
+        flex-direction: column;
+        background: var(--menu-bg);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 20px 16px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+        text-align: left;
+      }
+      .modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-size: 14px;
+      }
+      .modal-x {
+        background: none;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        border-radius: 8px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        font-size: 13px;
+        line-height: 1;
+      }
+      .modal-x:hover { color: var(--accent); border-color: var(--accent); }
+      .modal-sub { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 12px 0 0; }
+      .modal-body { overflow-y: auto; font-size: 13.5px; line-height: 1.7; margin-top: 12px; }
+      .modal-body p { margin: 0 0 12px; }
+      .modal-body p:last-child { margin-bottom: 0; }
+      @media (max-width: 620px) {
+        .dl-menu { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 560px) {
+        .links > a:not(:last-child) { display: none; }
+        .hero { padding: 56px 0 48px; }
+        .brand { font-size: 20px; gap: 8px; }
+        .brand-mark { width: 32px; height: 32px; }
+        .navdrop-btn { padding: 8px 9px; }
+        .lang { margin-left: 4px; }
+        .lang-btn { padding: 8px 7px; }
+        .theme-btn { padding: 8px; margin-left: 4px; }
+        .dl-count { min-height: 40px; font-size: 12px; }
+        .dl-menu, .inst-menu {
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: min(560px, calc(100vw - 32px));
+          max-height: calc(100svh - 40px);
+          overflow-y: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="side side-l" id="sideL" aria-hidden="true"></canvas>
+    <canvas class="side side-r" id="sideR" aria-hidden="true"></canvas>
+    <header>
+      <div class="wrap nav">
+        <a class="brand" href="/">
+          <span class="brand-mark"><img src="/logo.png" width="38" height="38" alt="YaPB logo" /></span>
+          YAPB
+        </a>
+        <nav class="links">
+          <a href="https://yapb.github.io/docs/en" id="docsLink">Docs</a>
+          <a href="https://github.com/yapb/graph">Graph</a>
+          <div class="navdrop" id="codeDrop">
+            <button class="navdrop-btn" id="codeBtn" aria-haspopup="true" aria-expanded="false">Code <span class="caret">▾</span></button>
+            <div class="navdrop-menu" id="codeMenu" hidden>
+              <a href="https://github.com/yapb/yapb" rel="noopener"><span>GitHub</span><span class="nd-host">github.com</span></a>
+              <span class="nd-off"><span>SourceCraft</span><span class="nd-soon" data-i18n="soon">soon</span></span>
+              <span class="nd-off"><span>Codeberg</span><span class="nd-soon" data-i18n="soon">soon</span></span>
+            </div>
+          </div>
+          <span class="lang" role="group" aria-label="Language">
+            <button class="lang-btn" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ru">RU</button>
+          </span>
+          <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">☀</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap hero">
+        <span class="badge"><span class="dot"></span><span data-i18n="badge">Open source · Counter-Strike / Condition Zero</span></span>
+        <h1>YA<span>PB</span></h1>
+        <p class="sub" data-i18n="heroSub">The <strong>Counter-Strike</strong> bot — download, drop in, play.</p>
+
+        <div class="cta">
+          <div class="dl" id="dl">
+            <button class="btn btn-primary" id="dlBtn" aria-haspopup="true" aria-expanded="false">
+              ↓&nbsp; <span data-i18n="download">Download</span> <span class="caret">▾</span>
+            </button>
+            <div class="dl-menu" id="dlMenu" hidden>
+              <div class="dl-group">
+                <div class="dl-group-title"><span data-i18n="grpStable">Stable</span> <span class="ver" id="verStable">…</span></div>
+                <div class="dl-items" id="listStable"></div>
+              </div>
+              <div class="dl-group">
+                <div class="dl-group-title"><span data-i18n="grpCont">Continuous</span> <span class="ver" id="verCont">…</span> <span class="pill" data-i18n="beta">beta</span></div>
+                <div class="dl-items" id="listCont"></div>
+              </div>
+              <a class="dl-all" href="https://github.com/yapb/yapb/releases" data-i18n="allReleases">All releases →</a>
+              <div class="dl-status" id="dlStatus" data-i18n="dlLoading">Loading live versions from GitHub…</div>
+            </div>
+          </div>
+          <div class="dl" id="inst">
+            <button class="btn btn-ghost" id="instBtn" aria-haspopup="true" aria-expanded="false">
+              <span data-i18n="install">Install</span> <span class="caret">▾</span>
+            </button>
+            <div class="inst-menu" id="instMenu" hidden>
+              <ol class="steps">
+                <li>
+                  <span class="step-n">01</span>
+                  <p data-i18n="inst1">Download the build for your OS.</p>
+                </li>
+                <li>
+                  <span class="step-n">02</span>
+                  <div>
+                    <p data-i18n="inst2">Unpack it into the <code>cstrike</code> folder (use <code>czero</code> for Condition Zero), then append this line to <code>addons/metamod/plugins.ini</code>:</p>
+                    <div class="codebox">
+                      <code id="instCode">win32 addons/yapb/bin/yapb.dll</code>
+                      <button class="copybtn" id="copyBtn" aria-label="Copy">⧉</button>
+                    </div>
+                    <p class="note" id="instNote" data-i18n="instNote">…or just run the .exe installer — it patches everything itself.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="step-n">03</span>
+                  <p><span data-i18n="inst3">Launch the game — bots will join.</span>
+                    <a id="instDocs" href="https://yapb.github.io/docs/en/getting-started/installation/" data-i18n="instDocs">Full guide →</a>
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <p class="dl-count" id="dlCount"><span id="dlNum"></span>&nbsp;<span id="dlLabel"></span><a id="dlStars" href="https://github.com/yapb/yapb" hidden>&nbsp;&nbsp;·&nbsp;&nbsp;★ <span id="starNum"></span>&nbsp;<span id="starLabel"></span></a><a id="dlForks" href="https://github.com/yapb/yapb/forks" hidden>&nbsp;&nbsp;·&nbsp;&nbsp;<svg class="stat-ico" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="4" cy="3.5" r="1.9" /><circle cx="12" cy="3.5" r="1.9" /><circle cx="8" cy="12.5" r="1.9" /><path d="M4 5.4v1.8c0 2.6 4 1.6 4 3.4M12 5.4v1.8c0 2.6-4 1.6-4 3.4" /></svg> <span id="forkNum"></span>&nbsp;<span id="forkLabel"></span></a></p>
+
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap foot">
+        <span data-i18n="footerLeft">YaPB — open-source Counter-Strike bot.</span>
+        <span><button class="foot-btn" id="licBtn">Unlicense</button></span>
+      </div>
+    </footer>
+
+    <div class="modal" id="licModal" hidden>
+      <div class="modal-back" data-close></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="licTitle">
+        <div class="modal-head">
+          <span id="licTitle">The Unlicense</span>
+          <button class="modal-x" id="licClose" aria-label="Close">✕</button>
+        </div>
+        <p class="modal-sub">YaPB, based on PODBot by Count Floyd<br />Maintained by YaPB Team &lt;yapb@jeefo.net&gt;</p>
+        <div class="modal-body">
+          <p>This is free and unencumbered software released into the public domain.</p>
+          <p>Anyone is free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form or as a compiled binary, for any purpose, commercial or non-commercial, and by any means.</p>
+          <p>In jurisdictions that recognize copyright laws, the author or authors of this software dedicate any and all copyright interest in the software to the public domain. We make this dedication for the benefit of the public at large and to the detriment of our heirs and successors. We intend this dedication to be an overt act of relinquishment in perpetuity of all present and future rights to this software under copyright law.</p>
+          <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+          <p>For more information, please refer to &lt;https://unlicense.org&gt;</p>
+        </div>
+        <p class="modal-note">
+          <span data-i18n="disclaimer">Not affiliated with Valve Corporation. Counter-Strike and Condition Zero are registered trademarks of Valve Corporation. Get the game on</span>
+          <a href="https://store.steampowered.com/" rel="noopener">Steam</a>.
+        </p>
+      </div>
+    </div>
+
+    <script is:inline>
+      // i18n: EN/RU dictionary + switcher
+      const I18N = {
+        en: {
+          badge: 'Open source · Counter-Strike / Condition Zero',
+          heroSub: 'The <strong>Counter-Strike</strong> bot — download, drop in, play.',
+          download: 'Download',
+          install: 'Install',
+          grpStable: 'Stable',
+          grpCont: 'Continuous',
+          beta: 'beta',
+          dlLoading: 'Loading live versions from GitHub…',
+          allReleases: 'All releases →',
+          footerLeft: 'YaPB — open-source Counter-Strike bot.',
+          soon: 'soon',
+          disclaimer: 'Not affiliated with Valve Corporation. Counter-Strike and Condition Zero are registered trademarks of Valve Corporation. Get the game on',
+          title: 'YaPB — The Counter-Strike Bot',
+          metaDesc: 'YaPB is an open-source bot for Counter-Strike 1.6 and Condition Zero. Download the latest release, grab waypoints, read the docs.',
+          themeLabel: 'Toggle theme',
+          closeLabel: 'Close',
+          docs: 'https://yapb.github.io/docs/en',
+          inst1: 'Download the build for your OS.',
+          inst2: 'Unpack it into the <code>cstrike</code> folder (use <code>czero</code> for Condition Zero), then append this line to <code>addons/metamod/plugins.ini</code>:',
+          instNote: '…or just run the .exe installer — it patches everything itself.',
+          inst3: 'Launch the game — bots will join.',
+          instDocs: 'Full guide →',
+          instDocsLink: 'https://yapb.github.io/docs/en/getting-started/installation/',
+          copyLabel: 'Copy',
+        },
+        ru: {
+          badge: 'Открытый код · Counter-Strike / Condition Zero',
+          heroSub: 'Бот для <strong>Counter-Strike</strong> — скачай, закинь, играй.',
+          download: 'Скачать',
+          install: 'Установка',
+          grpStable: 'Стабильная',
+          grpCont: 'Тестовая',
+          beta: 'бета',
+          dlLoading: 'Загружаю версии с GitHub…',
+          allReleases: 'Все релизы →',
+          footerLeft: 'YaPB — бот для Counter-Strike с открытым кодом.',
+          soon: 'скоро',
+          disclaimer: 'Не связаны с Valve Corporation. Counter-Strike и Condition Zero — зарегистрированные товарные знаки Valve Corporation. Игра доступна в',
+          title: 'YaPB — бот для Counter-Strike',
+          metaDesc: 'YaPB — бот с открытым кодом для Counter-Strike 1.6 и Condition Zero. Скачайте последний релиз, заберите графы, почитайте доки.',
+          themeLabel: 'Переключить тему',
+          closeLabel: 'Закрыть',
+          docs: 'https://yapb.github.io/docs/ru',
+          inst1: 'Скачай сборку под свою ОС.',
+          inst2: 'Распакуй архив в папку <code>cstrike</code> (для Condition Zero — <code>czero</code>), затем допиши эту строку в <code>addons/metamod/plugins.ini</code>:',
+          instNote: '…или просто запусти .exe-инсталлер — он всё пропатчит сам.',
+          inst3: 'Запускай игру — боты подключатся.',
+          instDocs: 'Полный гайд →',
+          instDocsLink: 'https://yapb.github.io/docs/ru/getting-started/installation/',
+          copyLabel: 'Копировать',
+        },
+      };
+      function applyLang(l) {
+        if (!I18N[l]) l = 'en';
+        window.yapbLang = l;
+        const d = I18N[l];
+        document.documentElement.lang = l;
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const k = el.getAttribute('data-i18n');
+          if (d[k] === undefined) return;
+          if (k === 'heroSub' || k === 'inst2') el.innerHTML = d[k];
+          else el.textContent = d[k];
+        });
+        document.title = d.title;
+        const md = document.querySelector('meta[name="description"]');
+        if (md) md.setAttribute('content', d.metaDesc);
+        const setMeta = (sel, val) => { const m = document.querySelector(sel); if (m) m.setAttribute('content', val); };
+        setMeta('#ogTitle', d.title);
+        setMeta('#ogDesc', d.metaDesc);
+        setMeta('#twTitle', d.title);
+        setMeta('#twDesc', d.metaDesc);
+        setMeta('#ogLocale', l === 'ru' ? 'ru_RU' : 'en_US');
+        document.getElementById('themeBtn').setAttribute('aria-label', d.themeLabel);
+        document.getElementById('licClose').setAttribute('aria-label', d.closeLabel);
+        document.getElementById('docsLink').href = d.docs;
+        document.getElementById('instDocs').href = d.instDocsLink;
+        document.getElementById('copyBtn').setAttribute('aria-label', d.copyLabel);
+        document.querySelectorAll('.lang-btn').forEach((b) => b.classList.toggle('active', b.dataset.lang === l));
+        try { localStorage.setItem('yapb-lang', l); } catch {}
+        dispatchEvent(new Event('yapb-lang'));
+      }
+      (() => {
+        let init = 'en';
+        try {
+          init = localStorage.getItem('yapb-lang')
+            || ((navigator.language || 'en').toLowerCase().startsWith('ru') ? 'ru' : 'en');
+        } catch {
+          init = (navigator.language || 'en').toLowerCase().startsWith('ru') ? 'ru' : 'en';
+        }
+        applyLang(init);
+        document.querySelectorAll('.lang-btn').forEach((b) =>
+          b.addEventListener('click', () => applyLang(b.dataset.lang))
+        );
+      })();
+    </script>
+
+    <script is:inline>
+      (() => {
+        const btn = document.getElementById('dlBtn');
+        const menu = document.getElementById('dlMenu');
+        const listStable = document.getElementById('listStable');
+        const listCont = document.getElementById('listCont');
+        const verStable = document.getElementById('verStable');
+        const verCont = document.getElementById('verCont');
+        const status = document.getElementById('dlStatus');
+
+        const L = {
+          en: { live: 'Live versions from GitHub', offline: 'GitHub API unreachable — download via github.com', open: 'Open on GitHub →' },
+          ru: { live: 'Версии с GitHub', offline: 'GitHub API недоступен — качайте с github.com', open: 'Открыть на GitHub →' },
+        };
+        const lang = () => (window.yapbLang === 'ru' ? 'ru' : 'en');
+        let dlState = 'loading';
+        addEventListener('yapb-lang', () => {
+          if (dlState === 'live') status.textContent = L[lang()].live;
+          else if (dlState === 'offline') { renderOffline(); status.textContent = L[lang()].offline; }
+          paintCount();
+          paintStars();
+          paintForks();
+        });
+
+        // Fallback (cached) — matches current GitHub state, used if API is rate-limited
+        const FALLBACK = {
+          stable: {
+            tag: '4.4.957',
+            assets: [
+              { name: 'yapb-4.4.957-windows.zip', size: 2050331, url: 'https://github.com/yapb/yapb/releases/download/4.4.957/yapb-4.4.957-windows.zip' },
+              { name: 'yapb-4.4.957-windows.exe', size: 2291920, url: 'https://github.com/yapb/yapb/releases/download/4.4.957/yapb-4.4.957-windows.exe' },
+              { name: 'yapb-4.4.957-linux.tar.xz', size: 1795296, url: 'https://github.com/yapb/yapb/releases/download/4.4.957/yapb-4.4.957-linux.tar.xz' },
+              { name: 'yapb-4.4.957-extras.zip', size: 4341658, url: 'https://github.com/yapb/yapb/releases/download/4.4.957/yapb-4.4.957-extras.zip' },
+            ],
+          },
+          cont: {
+            tag: 'continuous',
+            version: '4.5.1224',
+            assets: [
+              { name: 'yapb-4.5.1224-windows.zip', size: 2123026, url: 'https://github.com/yapb/yapb/releases/download/continuous/yapb-4.5.1224-windows.zip' },
+              { name: 'yapb-4.5.1224-windows.exe', size: 2361864, url: 'https://github.com/yapb/yapb/releases/download/continuous/yapb-4.5.1224-windows.exe' },
+              { name: 'yapb-4.5.1224-linux.tar.xz', size: 1869872, url: 'https://github.com/yapb/yapb/releases/download/continuous/yapb-4.5.1224-linux.tar.xz' },
+              { name: 'yapb-4.5.1224-extras.zip', size: 6298398, url: 'https://github.com/yapb/yapb/releases/download/continuous/yapb-4.5.1224-extras.zip' },
+            ],
+          },
+        };
+
+        function kind(name) {
+          const n = name.toLowerCase();
+          if (n.endsWith('windows.exe')) return { label: 'Windows installer', order: 2 };
+          if (n.includes('windows')) return { label: 'Windows', order: 1 };
+          if (n.includes('linux')) return { label: 'Linux', order: 3 };
+          if (n.includes('macos') || n.includes('darwin') || n.includes('osx')) return { label: 'macOS', order: 4 };
+          if (n.includes('extras')) return { label: 'Extras', order: 5 };
+          return { label: name, order: 9 };
+        }
+
+        function mb(size) {
+          if (!size) return '';
+          return (size / 1048576).toFixed(1) + ' MB';
+        }
+
+        function fmtDL(n) {
+          if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+          if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+          return String(n);
+        }
+
+        function pluralDL(n) {
+          const m10 = n % 10, m100 = n % 100;
+          if (m10 === 1 && m100 !== 11) return 'загрузка';
+          if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'загрузки';
+          return 'загрузок';
+        }
+
+        let dlTotal = 0;
+        function paintCount() {
+          if (!dlTotal) return;
+          document.getElementById('dlNum').textContent = '↓ ' + fmtDL(dlTotal);
+          document.getElementById('dlLabel').textContent = lang() === 'ru' ? pluralDL(dlTotal) : 'downloads';
+        }
+
+        let starTotal = 0;
+        function pluralStar(n) {
+          const m10 = n % 10, m100 = n % 100;
+          if (m10 === 1 && m100 !== 11) return 'звезда';
+          if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'звезды';
+          return 'звёзд';
+        }
+        function paintStars() {
+          if (!starTotal) return;
+          document.getElementById('starNum').textContent = fmtDL(starTotal);
+          document.getElementById('starLabel').textContent = lang() === 'ru' ? pluralStar(starTotal) : 'stars';
+          document.getElementById('dlStars').hidden = false;
+        }
+        let forkTotal = 0;
+        function pluralFork(n) {
+          const m10 = n % 10, m100 = n % 100;
+          if (m10 === 1 && m100 !== 11) return 'форк';
+          if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'форка';
+          return 'форков';
+        }
+        function paintForks() {
+          if (!forkTotal) return;
+          document.getElementById('forkNum').textContent = fmtDL(forkTotal);
+          document.getElementById('forkLabel').textContent = lang() === 'ru' ? pluralFork(forkTotal) : 'forks';
+          document.getElementById('dlForks').hidden = false;
+        }
+        fetch('https://api.github.com/repos/yapb/yapb')
+          .then((r) => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then((j) => { starTotal = j.stargazers_count || 0; forkTotal = j.forks_count || 0; paintStars(); paintForks(); })
+          .catch(() => {});
+
+        function render(el, assets) {
+          const sorted = [...assets].sort((a, b) => kind(a.name).order - kind(b.name).order);
+          el.innerHTML = '';
+          for (const a of sorted) {
+            const k = kind(a.name);
+            const link = document.createElement('a');
+            link.href = a.url;
+            link.rel = 'noopener';
+            const left = document.createElement('span');
+            left.textContent = k.label;
+            const right = document.createElement('span');
+            right.className = 'sz';
+            right.textContent = mb(a.size);
+            link.append(left, right);
+            el.appendChild(link);
+          }
+        }
+
+        function versionFromAssets(assets) {
+          const m = (assets[0] && assets[0].name.match(/yapb-(.+?)-(windows|linux|macos|extras)/i)) || null;
+          return m ? m[1] : '';
+        }
+
+        function renderOffline() {
+          // api.github.com unreachable — just link out to github.com
+          verStable.textContent = '';
+          verCont.textContent = '';
+          listStable.innerHTML = '';
+          listCont.innerHTML = '';
+          const s = document.createElement('a');
+          s.href = 'https://github.com/yapb/yapb/releases/latest';
+          s.rel = 'noopener';
+          const sLeft = document.createElement('span');
+          sLeft.textContent = L[lang()].open;
+          s.append(sLeft);
+          listStable.appendChild(s);
+          const c = document.createElement('a');
+          c.href = 'https://github.com/yapb/yapb/releases/tag/continuous';
+          c.rel = 'noopener';
+          const cLeft = document.createElement('span');
+          cLeft.textContent = L[lang()].open;
+          c.append(cLeft);
+          listCont.appendChild(c);
+        }
+
+        function applyFallback() {
+          verStable.textContent = FALLBACK.stable.tag;
+          verCont.textContent = FALLBACK.cont.version;
+          render(listStable, FALLBACK.stable.assets);
+          render(listCont, FALLBACK.cont.assets);
+        }
+
+        applyFallback();
+
+        fetch('https://api.github.com/repos/yapb/yapb/releases?per_page=100')
+          .then((r) => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then((releases) => {
+            const cont = releases.find((r) => r.tag_name === 'continuous');
+            const stable = releases.find((r) => !r.prerelease && r.tag_name !== 'continuous');
+            if (cont && cont.assets && cont.assets.length) {
+              const assets = cont.assets.map((a) => ({ name: a.name, size: a.size, url: a.browser_download_url }));
+              verCont.textContent = versionFromAssets(assets) || cont.tag_name;
+              render(listCont, assets);
+            }
+            if (stable && stable.assets && stable.assets.length) {
+              const assets = stable.assets.map((a) => ({ name: a.name, size: a.size, url: a.browser_download_url }));
+              verStable.textContent = stable.tag_name;
+              render(listStable, assets);
+            }
+            dlState = 'live';
+            status.textContent = L[lang()].live;
+            dlTotal = releases.reduce(
+              (s, r) => s + (r.assets || []).reduce((x, a) => x + (a.download_count || 0), 0),
+              0
+            );
+            paintCount();
+          })
+          .catch(() => {
+            renderOffline();
+            dlState = 'offline';
+            status.textContent = L[lang()].offline;
+          });
+
+        function toggle(force) {
+          const open = force !== undefined ? force : menu.hidden;
+          menu.hidden = !open;
+          btn.setAttribute('aria-expanded', String(open));
+        }
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggle();
+          const im = document.getElementById('instMenu');
+          if (im && !menu.hidden) { im.hidden = true; document.getElementById('instBtn').setAttribute('aria-expanded', 'false'); }
+        });
+        document.addEventListener('click', (e) => {
+          if (!menu.hidden && !document.getElementById('dl').contains(e.target)) toggle(false);
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') toggle(false);
+        });
+      })();
+    </script>
+
+    <script is:inline>
+      (() => {
+        const btn = document.getElementById('themeBtn');
+        const meta = document.getElementById('themeColor');
+        function paint() {
+          const light = document.documentElement.dataset.theme === 'light';
+          btn.textContent = light ? '☾' : '☀';
+          if (meta) meta.setAttribute('content', light ? '#f4f1ea' : '#080a0d');
+        }
+        btn.addEventListener('click', () => {
+          const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+          document.documentElement.dataset.theme = next;
+          try { localStorage.setItem('yapb-theme', next); } catch {}
+          paint();
+          dispatchEvent(new Event('yapb-theme'));
+        });
+        paint();
+      })();
+    </script>
+
+    <script is:inline>
+      // Side particles (m18-style): particles flock into the soldier silhouette
+      // sampled from /logo.png on each side, scatter from the cursor, reassemble.
+      (() => {
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const TAU = Math.PI * 2;
+
+        function palette() {
+          const css = getComputedStyle(document.documentElement);
+          const accent = css.getPropertyValue('--accent').trim() || '#ffb454';
+          const muted = css.getPropertyValue('--muted').trim() || '#a8a29e';
+          const light = document.documentElement.dataset.theme === 'light';
+          return light ? [accent, accent, '#8a8177', '#e08a3c'] : [accent, accent, muted, '#ffd9a0'];
+        }
+        let PAL = palette();
+        addEventListener('yapb-theme', () => { PAL = palette(); kick(); });
+
+        const mouse = { x: -9999, y: -9999 };
+        addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; kick(); }, { passive: true });
+        document.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; kick(); });
+
+        function drawFallback(c, S) {
+          const TAU = Math.PI * 2;
+          c.strokeStyle = '#fff'; c.fillStyle = '#fff'; c.lineCap = 'round';
+          c.lineWidth = 13;
+          c.beginPath(); c.arc(S / 2, S / 2, 76, 0, TAU); c.stroke();
+          c.lineWidth = 11;
+          const tick = (x1, y1, x2, y2) => { c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); };
+          tick(S / 2, 10, S / 2, 54); tick(S / 2, S - 10, S / 2, S - 54);
+          tick(10, S / 2, 54, S / 2); tick(S - 10, S / 2, S - 54, S / 2);
+          c.beginPath(); c.arc(S / 2, S / 2, 9, 0, TAU); c.fill();
+        }
+
+        // Soldier silhouette sampled from /logo.png (fallback: crosshair)
+        const logoImg = new Image();
+        let logoState = 'loading'; // 'ready' | 'failed'
+        logoImg.onload = () => { logoState = 'ready'; systems.forEach(relayout); kick(); };
+        logoImg.onerror = () => { logoState = 'failed'; systems.forEach(relayout); kick(); };
+        logoImg.src = '/logo.png';
+
+        function buildPoints(W, H) {
+          const S = 240;
+          const off = document.createElement('canvas');
+          off.width = S; off.height = S;
+          const c = off.getContext('2d', { willReadFrequently: true });
+          if (logoState === 'ready') {
+            c.drawImage(logoImg, 0, 0, S, S);
+          } else if (logoState === 'failed') {
+            drawFallback(c, S);
+          } else {
+            return [];
+          }
+          const data = c.getImageData(0, 0, S, S).data;
+          const k = (W * 0.82) / S;
+          const ox = W * 0.09, oy = H / 2 - (S / 2) * k;
+          let step = 4, pts = [];
+          while (step <= 10) {
+            pts = [];
+            for (let y = 0; y < S; y += step) {
+              for (let x = 0; x < S; x += step) {
+                if (data[(y * S + x) * 4 + 3] > 128) pts.push([ox + x * k, oy + y * k]);
+              }
+            }
+            if (pts.length <= 850) break;
+            step++;
+          }
+          return pts;
+        }
+
+        const systems = [];
+        function relayout(sys) {
+          const r = sys.cv.getBoundingClientRect();
+          if (!r.width || !r.height || getComputedStyle(sys.cv).display === 'none') { sys.w = 0; return; }
+          const dpr = Math.min(devicePixelRatio || 1, 2);
+          sys.w = r.width; sys.h = r.height;
+          sys.cv.width = Math.round(r.width * dpr);
+          sys.cv.height = Math.round(r.height * dpr);
+          sys.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          sys.rect = r;
+          sys.parts = buildPoints(sys.w, sys.h).map(([tx, ty]) => {
+            const p = {
+              tx, ty,
+              x: Math.random() * sys.w, y: Math.random() * sys.h,
+              vx: 0, vy: 0,
+              s: 2 + Math.random() * 2.5,
+              ci: (Math.random() * 4) | 0,
+              ph: Math.random() * TAU,
+              sp: 0.5 + Math.random(),
+            };
+            if (reduced) { p.x = tx; p.y = ty; }
+            return p;
+          });
+        }
+
+        // One-shot loop: runs only while particles are assembling or the
+        // cursor is nearby. Settles → stops. Never restarts by itself.
+        let raf = 0;
+        function kick() {
+          if (!raf && !reduced) raf = requestAnimationFrame(frame);
+        }
+
+        function frame() {
+          let moving = false;
+          for (const sys of systems) {
+            if (!sys.w) continue;
+            const { ctx, parts } = sys;
+            ctx.clearRect(0, 0, sys.w, sys.h);
+            const hov = mouse.x >= sys.rect.left - 120 && mouse.x <= sys.rect.left + sys.w + 120
+              && mouse.y >= sys.rect.top - 120 && mouse.y <= sys.rect.top + sys.h + 120;
+            if (hov) moving = true;
+            const mx = mouse.x - sys.rect.left, my = mouse.y - sys.rect.top;
+            for (const p of parts) {
+              const dx = p.tx - p.x, dy = p.ty - p.y;
+              const d = Math.hypot(dx, dy) || 1;
+              const f = Math.min(d * 0.02, 2.2);
+              p.vx += (dx / d) * f;
+              p.vy += (dy / d) * f;
+              const mdx = p.x - mx, mdy = p.y - my;
+              const md = Math.hypot(mdx, mdy);
+              if (md < 110 && md > 0.01) {
+                const rf = (1 - md / 110) * 3.4;
+                p.vx += (mdx / md) * rf;
+                p.vy += (mdy / md) * rf;
+              }
+              p.vx *= 0.9; p.vy *= 0.9;
+              p.x += p.vx; p.y += p.vy;
+              ctx.fillStyle = PAL[p.ci % PAL.length];
+              ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
+              if (Math.hypot(p.vx, p.vy) > 0.15 || Math.hypot(p.tx - p.x, p.ty - p.y) > 1) moving = true;
+            }
+          }
+          raf = 0;
+          if (moving && !reduced) raf = requestAnimationFrame(frame);
+        }
+
+        for (const id of ['sideL', 'sideR']) {
+          const cv = document.getElementById(id);
+          if (!cv) continue;
+          const sys = { cv, ctx: cv.getContext('2d'), parts: [], w: 0, h: 0, rect: null };
+          systems.push(sys);
+          relayout(sys);
+        }
+        let rT;
+        addEventListener('resize', () => {
+          clearTimeout(rT);
+          rT = setTimeout(() => { systems.forEach(relayout); kick(); }, 150);
+        });
+        requestAnimationFrame(frame);
+      })();
+    </script>
+
+    <script is:inline>
+      (() => {
+        const modal = document.getElementById('licModal');
+        const openBtn = document.getElementById('licBtn');
+        const closeBtn = document.getElementById('licClose');
+        let lastFocus = null;
+        function open() {
+          lastFocus = document.activeElement;
+          modal.hidden = false;
+          document.body.style.overflow = 'hidden';
+          closeBtn.focus();
+        }
+        function close() {
+          modal.hidden = true;
+          document.body.style.overflow = '';
+          if (lastFocus) lastFocus.focus();
+        }
+        openBtn.addEventListener('click', open);
+        closeBtn.addEventListener('click', close);
+        modal.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close')) close(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
+      })();
+    </script>
+
+    <script is:inline>
+      (() => {
+        const btn = document.getElementById('codeBtn');
+        const menu = document.getElementById('codeMenu');
+        function toggle(force) {
+          const open = force !== undefined ? force : menu.hidden;
+          menu.hidden = !open;
+          btn.setAttribute('aria-expanded', String(open));
+        }
+        btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+        document.addEventListener('click', (e) => {
+          if (!menu.hidden && !document.getElementById('codeDrop').contains(e.target)) toggle(false);
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggle(false); });
+      })();
+    </script>
+
+    <script is:inline>
+      // Install dropdown: toggle + copy button
+      (() => {
+        const instBtn = document.getElementById('instBtn');
+        const instMenu = document.getElementById('instMenu');
+        const dlMenu = document.getElementById('dlMenu');
+        const dlBtn = document.getElementById('dlBtn');
+        function toggleInst(force) {
+          const open = force !== undefined ? force : instMenu.hidden;
+          instMenu.hidden = !open;
+          instBtn.setAttribute('aria-expanded', String(open));
+          if (open) { dlMenu.hidden = true; dlBtn.setAttribute('aria-expanded', 'false'); }
+        }
+        instBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleInst(); });
+        document.addEventListener('click', (e) => {
+          if (!instMenu.hidden && !document.getElementById('inst').contains(e.target)) toggleInst(false);
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleInst(false); });
+
+        const code = document.getElementById('instCode');
+        const copy = document.getElementById('copyBtn');
+        copy.addEventListener('click', async () => {
+          const text = code.textContent;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch {}
+            ta.remove();
+          }
+          const old = copy.textContent;
+          copy.textContent = '✓';
+          setTimeout(() => { copy.textContent = old; }, 1200);
+        });
+      })();
+    </script>
+  </body>
+</html>

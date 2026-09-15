@@ -1,0 +1,32 @@
+# YaPB
+
+> YaPB is an open-source bot for Counter-Strike 1.6 and Condition Zero,
+> based on PODBot by Count Floyd. Maintained by the YaPB Team.
+> Released into the public domain under The Unlicense.
+
+## Download
+
+- [Latest stable release](https://github.com/yapb/yapb/releases/latest): production-ready build.
+- [Continuous build](https://github.com/yapb/yapb/releases/tag/continuous): rolling development build (beta).
+- Each release ships Windows (.zip archive and .exe installer), Linux (.tar.xz), and Extras (.zip) assets.
+- [All releases](https://github.com/yapb/yapb/releases)
+
+## Docs
+
+- [Documentation (English)](https://yapb.github.io/docs/en): install, setup, commands, configuration.
+- [Documentation (Russian)](https://yapb.github.io/docs/ru): установка, настройка, команды, конфигурация.
+
+## Source code
+
+- [GitHub](https://github.com/yapb/yapb): primary repository, releases, issue tracker.
+- [SourceCraft](https://sourcecraft.dev/yapb/yapb): mirror repository.
+- [Codeberg](https://codeberg.org/yapb/yapb): mirror repository.
+
+## Waypoints (graphs)
+
+- [Graph database](https://github.com/yapb/graph): per-map navigation files.
+- [All graphs (.zip)](https://github.com/yapb/graph/archive/master.zip): full snapshot.
+
+## License
+
+The Unlicense (public domain). Full text: <https://unlicense.org>
