@@ -123,7 +123,10 @@
       }
       .side-l { left: 0; }
       .side-r { right: 0; }
-      @media (max-width: 1150px) { .side { display: none; } }
+      @media (max-width: 1150px) {
+        .side { width: min(200px, 20vw); opacity: 0.6; }
+      }
+      @media (max-width: 820px) { .side { display: none; } }
       a:link, a:visited { color: var(--text); text-decoration: none; }
       .links a:link, .links a:visited { color: var(--muted); }
       .links a:hover { color: var(--accent); background: var(--hover); border-color: var(--accent); }
@@ -315,7 +318,22 @@
         text-transform: uppercase;
         color: var(--muted);
         min-height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
       }
+      .dl-count .stat,
+      .dl-count a.stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        text-decoration: none;
+      }
+      .dl-count .sep { opacity: 0.5; margin-right: 2px; }
+      .dl-count [hidden] { display: none !important; }
       #dlNum { color: var(--accent); font-weight: 800; }
       .cta {
         margin-top: 36px;
@@ -600,7 +618,8 @@
         .lang { margin-left: 4px; }
         .lang-btn { padding: 8px 7px; }
         .theme-btn { padding: 8px; margin-left: 4px; }
-        .dl-count { min-height: 40px; font-size: 12px; }
+        .dl-count { min-height: 40px; font-size: 12px; flex-direction: column; gap: 6px; }
+        .dl-count .sep { display: none; }
         .dl-menu, .inst-menu {
           position: fixed;
           left: 50%;
@@ -697,7 +716,7 @@
             </div>
           </div>
         </div>
-        <p class="dl-count" id="dlCount"><span id="dlNum"></span>&nbsp;<span id="dlLabel"></span><a id="dlStars" href="https://github.com/yapb/yapb" hidden>&nbsp;&nbsp;·&nbsp;&nbsp;★ <span id="starNum"></span>&nbsp;<span id="starLabel"></span></a><a id="dlForks" href="https://github.com/yapb/yapb/forks" hidden>&nbsp;&nbsp;·&nbsp;&nbsp;<svg class="stat-ico" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="4" cy="3.5" r="1.9" /><circle cx="12" cy="3.5" r="1.9" /><circle cx="8" cy="12.5" r="1.9" /><path d="M4 5.4v1.8c0 2.6 4 1.6 4 3.4M12 5.4v1.8c0 2.6-4 1.6-4 3.4" /></svg> <span id="forkNum"></span>&nbsp;<span id="forkLabel"></span></a></p>
+        <p class="dl-count" id="dlCount"><span class="stat"><span id="dlNum"></span><span id="dlLabel"></span></span><a class="stat" id="dlStars" href="https://github.com/yapb/yapb" hidden><span class="sep" aria-hidden="true">·</span><span>★</span><span id="starNum"></span><span id="starLabel"></span></a><a class="stat" id="dlForks" href="https://github.com/yapb/yapb/forks" hidden><span class="sep" aria-hidden="true">·</span><svg class="stat-ico" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="4" cy="3.5" r="1.9" /><circle cx="12" cy="3.5" r="1.9" /><circle cx="8" cy="12.5" r="1.9" /><path d="M4 5.4v1.8c0 2.6 4 1.6 4 3.4M12 5.4v1.8c0 2.6-4 1.6-4 3.4" /></svg><span id="forkNum"></span><span id="forkLabel"></span></a></p>
 
       </div>
     </main>
@@ -1089,7 +1108,11 @@
           return light ? [accent, accent, '#8a8177', '#e08a3c'] : [accent, accent, muted, '#ffd9a0'];
         }
         let PAL = palette();
-        addEventListener('yapb-theme', () => { PAL = palette(); kick(); });
+        addEventListener('yapb-theme', () => {
+          PAL = palette();
+          if (reduced) systems.forEach(paint);
+          else kick();
+        });
 
         const mouse = { x: -9999, y: -9999 };
         addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; kick(); }, { passive: true });
@@ -1144,6 +1167,17 @@
         }
 
         const systems = [];
+        // Static one-shot painter for prefers-reduced-motion: no rAF loop
+        // there, so paint the assembled silhouette directly.
+        function paint(sys) {
+          if (!sys.w) return;
+          const { ctx, parts } = sys;
+          ctx.clearRect(0, 0, sys.w, sys.h);
+          for (const p of parts) {
+            ctx.fillStyle = PAL[p.ci % PAL.length];
+            ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
+          }
+        }
         function relayout(sys) {
           const r = sys.cv.getBoundingClientRect();
           if (!r.width || !r.height || getComputedStyle(sys.cv).display === 'none') { sys.w = 0; return; }
@@ -1166,6 +1200,7 @@
             if (reduced) { p.x = tx; p.y = ty; }
             return p;
           });
+          if (reduced) paint(sys);
         }
 
         // One-shot loop: runs only while particles are assembling or the
@@ -1221,6 +1256,9 @@
           clearTimeout(rT);
           rT = setTimeout(() => { systems.forEach(relayout); kick(); }, 150);
         });
+        // Styles may still be loading when this inline script first measures
+        // the canvases, so re-measure once everything (CSS, logo) is in place.
+        addEventListener('load', () => { systems.forEach(relayout); kick(); }, { once: true });
         requestAnimationFrame(frame);
       })();
     </script>
