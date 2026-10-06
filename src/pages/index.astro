@@ -369,6 +369,8 @@
       .caret { font-size: 12px; opacity: 0.7; }
       /* download dropdown */
       .dl { position: relative; display: inline-block; }
+      /* install hidden for now — markup and logic kept */
+      #inst { display: none; }
       .dl-menu {
         position: absolute;
         top: calc(100% + 10px);
@@ -610,7 +612,6 @@
       }
       @media (max-width: 560px) {
         .links > a:not(:last-child) { display: none; }
-        #inst { display: none; }
         .hero { padding: 56px 0 48px; }
         .brand { font-size: 20px; gap: 8px; }
         .brand-mark { width: 32px; height: 32px; }
