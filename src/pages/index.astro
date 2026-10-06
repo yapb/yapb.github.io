@@ -900,6 +900,7 @@
 
         function kind(name) {
           const n = name.toLowerCase();
+          if (n.endsWith('.asc')) return null; // detached signature — never shown
           if (n.endsWith('windows.exe')) return { label: 'Windows installer', order: 2 };
           if (n.includes('windows')) return { label: 'Windows', order: 1 };
           if (n.includes('linux')) return { label: 'Linux', order: 3 };
@@ -968,10 +969,12 @@
           .catch(() => {});
 
         function render(el, assets) {
-          const sorted = [...assets].sort((a, b) => kind(a.name).order - kind(b.name).order);
+          const sorted = [...assets]
+            .map((a) => ({ asset: a, k: kind(a.name) }))
+            .filter((x) => x.k)
+            .sort((a, b) => a.k.order - b.k.order);
           el.innerHTML = '';
-          for (const a of sorted) {
-            const k = kind(a.name);
+          for (const { asset: a, k } of sorted) {
             const link = document.createElement('a');
             link.href = a.url;
             link.rel = 'noopener';
@@ -986,7 +989,8 @@
         }
 
         function versionFromAssets(assets) {
-          const m = (assets[0] && assets[0].name.match(/yapb-(.+?)-(windows|linux|macos|extras)/i)) || null;
+          const vis = assets.filter((a) => kind(a.name));
+          const m = (vis[0] && vis[0].name.match(/yapb-(.+?)-(windows|linux|macos|extras)/i)) || null;
           return m ? m[1] : '';
         }
 
